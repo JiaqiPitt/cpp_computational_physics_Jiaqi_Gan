@@ -1,0 +1,72 @@
+Exercise 7
+==========
+
+I changed the EX6 build from the static library libPlus.a to the macOS
+dynamic library libPlus.dylib. The executable was linked with an rpath so
+that it could find the dynamic library in the same directory.
+
+Command:
+
+    ./plus 3 7
+
+Output:
+
+    3+7=10
+
+Command:
+
+    otool -L plus
+
+Output:
+
+    plus:
+        @rpath/libPlus.dylib (compatibility version 0.0.0, current version 0.0.0)
+        /usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2100.43.0)
+        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)
+
+The @rpath entry shows that plus loads libPlus.dylib at runtime.
+
+Command:
+
+    nm -u plus | c++filt | grep -E 'parse_arguments|add|print_result'
+
+Output:
+
+    print_result(int, int, int)
+    parse_arguments(int, char**, int&, int&)
+    add(int, int)
+
+Because nm was run with -u, all three lines are undefined symbols in the
+executable. Their implementations must be obtained from the dynamic
+library.
+
+Command:
+
+    nm libPlus.dylib | c++filt | grep -E 'parse_arguments|add|print_result'
+
+Output:
+
+    0000000000001140 T print_result(int, int, int)
+    0000000000000498 T parse_arguments(int, char**, int&, int&)
+    0000000000001120 T add(int, int)
+    0000000000000e28 t char* std::__1::__to_address[abi:nqe210106]<char>(char*)
+
+The uppercase T symbols show that the three functions are defined inside
+libPlus.dylib. The extra lowercase t line was included because its mangled
+name contains the text "add" as part of "address"; it is not the add
+function from this exercise.
+
+Command:
+
+    stat -f '%N: %z bytes' ../EX6/plus plus libPlus.dylib
+
+Output:
+
+    ../EX6/plus: 39672 bytes
+    plus: 33592 bytes
+    libPlus.dylib: 39568 bytes
+
+I observed that the dynamically linked executable was 6,080 bytes smaller than the
+statically linked executable. However, the dynamic version also requires
+the separate 39,568-byte library. The conclusion is that a dynamic library becomes more useful
+when several programs share the same library file.

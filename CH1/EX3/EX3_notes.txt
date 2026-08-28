@@ -1,0 +1,13 @@
+Exercise 3
+==========
+
+I just implemented my own exponential function using 100 terms of the Taylor
+series. Its results agreed with std::exp to the displayed precision for
+most of the tested values. Small differences appeared at x = -10 and
+x = -8 because the alternating Taylor terms cause some loss of floating
+point precision.
+
+For custom_exp, nm showed `T my_exp(double)`, I guess it means that the
+function was defined inside the executable. The custom executable had no
+undefined _exp symbol. For system_exp, nm showed `U _exp`, basically means that
+the function had to be obtained from an external system library.

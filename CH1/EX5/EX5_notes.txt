@@ -1,0 +1,51 @@
+Exercise 5
+==========
+
+I wrote a program called plus that reads two integer command-line
+arguments, adds them, and prints the complete calculation.
+
+Command:
+
+    ./plus 3 7
+    echo $?
+
+Output:
+
+    3+7=10
+    0
+
+Command:
+
+    ./plus -5 12
+    echo $?
+
+Output:
+
+    -5+12=7
+    0
+
+Both valid inputs returned 0, which indicates successful execution.
+
+Command:
+
+    ./plus 3
+    echo $?
+
+Output:
+
+    Usage: ./plus <integer1> <integer2>
+    1
+
+Command:
+
+    ./plus apple 7
+    echo $?
+
+Output:
+
+    Error: both arguments must be integers.
+    1
+
+The program returned 1 when the number of arguments was incorrect or an
+argument could not be converted to an integer.
+

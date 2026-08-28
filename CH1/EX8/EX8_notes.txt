@@ -1,0 +1,54 @@
+Exercise 8
+==========
+
+I added Makefiles to EX1 through EX5 and kept the Makefiles from EX6 and
+EX7. Every Makefile has an all target for building its programs and a
+clean target for removing executables, object files, and libraries.
+
+Commands used to clean and rebuild all exercises:
+
+    for dir in EX{1..7}; do
+        make -C "$dir" clean || break
+    done
+
+    for dir in EX{1..7}; do
+        make -C "$dir" || break
+    done
+
+I then ran the executables from the CH1 directory.
+
+Commands:
+
+    EX1/exp
+    EX2/exp 5
+    EX3/custom_exp
+    EX4/foo A B C
+    EX5/plus 3 7
+    EX6/plus 3 7
+    EX7/plus 3 7
+
+Output:
+
+    [EX1/exp produced no output]
+    148.413
+    x       my_exp(x)
+    -10     4.5399929670e-05
+    -8      3.3546262786e-04
+    -6      2.4787521767e-03
+    -4      1.8315638889e-02
+    -2      1.3533528324e-01
+    0       1.0000000000e+00
+    2       7.3890560989e+00
+    4       5.4598150033e+01
+    6       4.0342879349e+02
+    8       2.9809579870e+03
+    10      2.2026465795e+04
+    EX4/foo A B C
+    3+7=10
+    3+7=10
+    3+7=10
+
+EX1 produced no output because it only calculates and stores a value.
+The remaining programs produced their expected results. I also checked
+the seven directories with make -q and make -n clean; all seven builds
+were up to date and all seven clean targets were defined correctly.

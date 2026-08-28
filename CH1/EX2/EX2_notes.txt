@@ -1,0 +1,13 @@
+Exercise 2
+==========
+
+I changed the program so that it reads one command-line argument and
+converts it to a double with std::stod. Running `./exp 5` printed
+148.413. I also tested missing and invalid arguments, and the program
+returned 1 in both error cases.
+
+The executable was still an ARM64 Mach-O file linked to libc++ and
+libSystem. In the nm output, both std::stod and _exp were marked with U,
+so they are supplied by external libraries. c++filt converted the encoded
+std::stod symbol into a readable C++ function signature. The _exp symbol
+did not change after c++filt.

@@ -1,0 +1,99 @@
+Exercise 10
+===========
+
+I cloned the public ACP-Examples repository and examined the monolithic
+Legendre plotting program in CH1/LEGENDRE/MONOLITH. The repository was on
+the master branch with a clean working tree.
+
+The original program did not compile with Apple Clang because the Apple
+C++ standard library does not provide std::legendre.
+
+Command:
+
+    clang++ -std=c++20 -Wall -Wextra -pedantic legendre.cpp -o legendre
+
+Output:
+
+    legendre.cpp:57:21: error: no member named 'legendre' in namespace 'std'
+       57 |     double y = std::legendre(l, x);
+          |                     ^~~~~~~~
+    1 error generated.
+
+I copied the program into my EX10 directory instead of changing the
+author's repository. I replaced std::legendre with a local implementation
+of the Legendre recurrence relation. The compatible program successfully
+plotted P_4(x) as an ASCII graph.
+
+For the new special function, I chose the physicists' Hermite polynomials.
+They have a recurrence structure similar to the Legendre polynomials:
+
+    H_0(x) = 1
+    H_1(x) = 2x
+    H_(n+1)(x) = 2x H_n(x) - 2n H_(n-1)(x)
+
+I plotted orders 0 through 4 on the interval [-2, 2]. The vertical scale
+was calculated separately for each order because Hermite polynomials are
+not restricted to the range [-1, 1].
+
+Command:
+
+    for n in 0 1 2 3 4; do
+        ./hermite "$n" > "hermite_${n}.txt"
+    done
+
+Command:
+
+    ls -l hermite_*.txt
+
+Output:
+
+    -rw-r--r--  1 jiaqigan  staff  3404 Aug 26 14:20 hermite_0.txt
+    -rw-r--r--  1 jiaqigan  staff  3404 Aug 26 14:20 hermite_1.txt
+    -rw-r--r--  1 jiaqigan  staff  3404 Aug 26 14:20 hermite_2.txt
+    -rw-r--r--  1 jiaqigan  staff  3404 Aug 26 14:20 hermite_3.txt
+    -rw-r--r--  1 jiaqigan  staff  3404 Aug 26 14:20 hermite_4.txt
+
+The H_4 output began with:
+
+    Hermite Polynomial H_4(x), -2 <= x <= 2
+
+The complete ASCII plots are saved in hermite_0.txt through
+hermite_4.txt. The original compatible plot is saved in legendre_4.txt.
+
+I also tested invalid command-line input.
+
+Command:
+
+    ./hermite
+    echo $?
+
+Output:
+
+    usage: ./hermite <n>
+    1
+
+Command:
+
+    ./hermite -1
+    echo $?
+
+Output:
+
+    n must be non-negative.
+    3
+
+Finally, I tested a clean rebuild with the Makefile.
+
+Command:
+
+    make clean
+    make
+
+Output:
+
+    rm -f legendre hermite *.o
+    clang++ -std=c++20 -Wall -Wextra -pedantic legendre.cpp -o legendre
+    clang++ -std=c++20 -Wall -Wextra -pedantic hermite.cpp -o hermite
+
+The .gitignore file excludes the two compiled executables, object files,
+and debugger output. The cloned ACP-Examples repository remained clean.

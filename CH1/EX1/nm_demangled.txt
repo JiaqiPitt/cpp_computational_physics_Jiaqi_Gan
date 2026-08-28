@@ -1,0 +1,6 @@
+0000000100000530 T calculate(double)
+0000000100000000 T __mh_execute_header
+                 U _exp
+0000000100008000 D _input
+0000000100000544 T _main
+0000000100008008 S _result

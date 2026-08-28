@@ -1,0 +1,48 @@
+Exercise 1 Notes
+================
+
+I first wrote an empty C++ program and compiled it with:
+
+clang++ -std=c++20 exp.cpp -o exp
+
+The command `file exp` showed that the result was a 64-bit ARM64 Mach-O
+executable. This makes sense because I am using an Apple Silicon Mac.
+
+I then ran `otool -L exp`. It showed that the program was linked to
+libc++.1.dylib and libSystem.B.dylib. The program did not call any
+functions directly, so `nm -u exp` did not print anything.
+
+Next, I added a call to `std::exp(1.0)`. When I compiled the program with
+-O2, `_exp` did not appear in the output from nm. Since the argument was
+a constant, the compiler calculated the answer during compilation.
+
+I then changed the argument to a volatile variable:
+
+volatile double input = 1.0;
+result = std::exp(input);
+
+This time `nm -u` showed:
+
+U _exp
+
+（just googled it）The `U` means that exp is not defined inside my executable. It is provided
+by an external library. On macOS, the math functions are included in
+libSystem.B.dylib, so I did not need to link a separate math library with
+-lm.
+
+To test `c++filt`, I wrote a function called:
+
+double calculate(double x)
+
+The original nm output was:
+
+__Z9calculated
+
+After piping the output through c++filt, it became as such:
+
+calculate(double)
+
+This clearly shows that the C++ compiler changes function names to include type
+information. It seems like c++filt changes the encoded name back into a readable form.
+And the `_exp` symbol did not need this conversion because exp comes from a
+C-compatible math library.

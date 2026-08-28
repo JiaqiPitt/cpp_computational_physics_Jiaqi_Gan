@@ -1,0 +1,74 @@
+00000001000012dc s GCC_except_table12
+0000000100001310 s GCC_except_table15
+0000000100001328 s GCC_except_table37
+0000000100001338 s GCC_except_table41
+                 U __Unwind_Resume
+0000000100000f5c t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__is_long[abi:nqe210106]() const
+0000000100000a24 t std::__1::basic_ostream<char, std::__1::char_traits<char>>::sentry::operator bool[abi:nqe210106]() const
+0000000100001138 t std::__1::_SentinelValueFill<std::__1::char_traits<char>>::__get[abi:nqe210106]() const
+0000000100001060 t std::__1::_SentinelValueFill<std::__1::char_traits<char>>::__is_set[abi:nqe210106]() const
+0000000100000d04 t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>::failed[abi:nqe210106]() const
+0000000100001184 t std::__1::ctype<char>::widen[abi:nqe210106](char) const
+                 U std::__1::locale::use_facet(std::__1::locale::id&) const
+0000000100000c88 t std::__1::ios_base::flags[abi:nqe210106]() const
+0000000100001048 t std::__1::ios_base::rdbuf[abi:nqe210106]() const
+0000000100000d60 t std::__1::ios_base::width[abi:nqe210106]() const
+                 U std::__1::ios_base::getloc() const
+0000000100000ca0 t std::__1::basic_ios<char, std::__1::char_traits<char>>::fill[abi:nqe210106]() const
+0000000100001024 t std::__1::basic_ios<char, std::__1::char_traits<char>>::rdbuf[abi:nqe210106]() const
+0000000100001098 t std::__1::basic_ios<char, std::__1::char_traits<char>>::widen[abi:nqe210106](char) const
+0000000100000640 t std::__1::scientific[abi:nqe210106](std::__1::ios_base&)
+0000000100001150 t std::__1::char_traits<char>::eof[abi:nqe210106]()
+0000000100000a00 t std::__1::char_traits<char>::length[abi:nqe210106](char const*)
+0000000100000ef4 t char* std::__1::__to_address[abi:nqe210106]<char>(char*)
+0000000100000f08 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__get_pointer[abi:nqe210106]()
+0000000100000f80 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__get_long_pointer[abi:nqe210106]()
+0000000100000f98 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__get_short_pointer[abi:nqe210106]()
+0000000100000df0 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::data[abi:nqe210106]()
+                 U std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__init(unsigned long, char)
+0000000100000db4 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::basic_string[abi:nqe210106](unsigned long, char)
+0000000100000e44 t std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::basic_string[abi:nqe210106](unsigned long, char)
+                 U std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::~basic_string()
+0000000100000670 t std::__1::setprecision[abi:nqe210106](int)
+                 U std::__1::basic_ostream<char, std::__1::char_traits<char>>::sentry::sentry(std::__1::basic_ostream<char, std::__1::char_traits<char>>&)
+                 U std::__1::basic_ostream<char, std::__1::char_traits<char>>::sentry::~sentry()
+0000000100000600 t std::__1::basic_ostream<char, std::__1::char_traits<char>>::operator<<[abi:nqe210106](std::__1::ios_base& (*)(std::__1::ios_base&))
+                 U std::__1::basic_ostream<char, std::__1::char_traits<char>>::operator<<(double)
+                 U std::__1::basic_ostream<char, std::__1::char_traits<char>>::operator<<(int)
+0000000100000fbc t std::__1::pointer_traits<char*>::pointer_to[abi:nqe210106](char&)
+0000000100000d78 t std::__1::basic_streambuf<char, std::__1::char_traits<char>>::sputn[abi:nqe210106](char const*, long)
+0000000100000ee0 t std::__1::__non_trivial_if<true, std::__1::allocator<char>>::__non_trivial_if[abi:nqe210106]()
+0000000100000a40 t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>> std::__1::__pad_and_output[abi:nqe210106]<char, std::__1::char_traits<char>>(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>, char const*, char const*, char const*, std::__1::ios_base&, char)
+0000000100001118 t std::__1::_SentinelValueFill<std::__1::char_traits<char>>::operator=[abi:nqe210106](int)
+00000001000011ec t unsigned long std::__1::__constexpr_strlen[abi:nqe210106]<char>(char const*)
+0000000100000c54 t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>::ostreambuf_iterator[abi:nqe210106](std::__1::basic_ostream<char, std::__1::char_traits<char>>&)
+0000000100000fd0 t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>::ostreambuf_iterator[abi:nqe210106](std::__1::basic_ostream<char, std::__1::char_traits<char>>&)
+000000010000081c t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::__put_character_sequence[abi:nqe210106]<char, std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, char const*, unsigned long)
+                 U std::__1::cout
+                 U std::__1::ctype<char>::id
+                 U std::__1::locale::~locale()
+000000010000079c t std::__1::__iom_t5::__iom_t5[abi:nqe210106](int)
+00000001000007d0 t std::__1::__iom_t5::__iom_t5[abi:nqe210106](int)
+                 U std::__1::ios_base::__set_badbit_and_consider_rethrow()
+0000000100000718 t std::__1::ios_base::setf[abi:nqe210106](unsigned int, unsigned int)
+                 U std::__1::ios_base::clear(unsigned int)
+0000000100000e18 t std::__1::ios_base::width[abi:nqe210106](long)
+0000000100000774 t std::__1::ios_base::unsetf[abi:nqe210106](unsigned int)
+00000001000011b8 t std::__1::ios_base::setstate[abi:nqe210106](unsigned int)
+00000001000007f0 t std::__1::ios_base::precision[abi:nqe210106](long)
+0000000100000e88 t std::__1::allocator<char>::allocator[abi:nqe210106]()
+0000000100000eb4 t std::__1::allocator<char>::allocator[abi:nqe210106]()
+0000000100000d24 t std::__1::basic_ios<char, std::__1::char_traits<char>>::setstate[abi:nqe210106](unsigned int)
+0000000100001158 t std::__1::ctype<char> const& std::__1::use_facet[abi:nqe210106]<std::__1::ctype<char>>(std::__1::locale const&)
+000000010000069c t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::operator<<[abi:nqe210106]<std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, char const*)
+00000001000006e4 t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::operator<<[abi:nqe210106]<std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, char)
+00000001000005c0 t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::operator<<[abi:nqe210106]<char, std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, std::__1::__iom_t5 const&)
+                 U std::terminate()
+0000000100000d50 t ___clang_call_terminate
+                 U ___cxa_begin_catch
+                 U ___cxa_end_catch
+                 U ___gxx_personality_v0
+0000000100000000 T __mh_execute_header
+                 U _exp
+00000001000004e8 T _main
+                 U _strlen

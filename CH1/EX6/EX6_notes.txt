@@ -1,0 +1,59 @@
+Exercise 6
+==========
+
+I split the plus program into four compilation units: main.cpp,
+parse.cpp, add.cpp, and print.cpp. The shared function declarations were
+placed in plus.hpp. The parse, add, and print object files were stored in
+a static library called libPlus.a.
+
+Command:
+
+    make clean
+    make
+
+Output:
+
+    rm -f *.o libPlus.a plus
+    clang++ -std=c++20 -Wall -Wextra -pedantic -c parse.cpp -o parse.o
+    clang++ -std=c++20 -Wall -Wextra -pedantic -c add.cpp -o add.o
+    clang++ -std=c++20 -Wall -Wextra -pedantic -c print.cpp -o print.o
+    ar rcs libPlus.a parse.o add.o print.o
+    clang++ -std=c++20 -Wall -Wextra -pedantic -c main.cpp -o main.o
+    clang++ -std=c++20 -Wall -Wextra -pedantic main.o -L. -lPlus -o plus
+
+The -c option compiled each source file without linking it. The ar command
+then placed parse.o, add.o, and print.o into the static library. Finally,
+main.o was linked with libPlus.a to produce the executable.
+
+Command:
+
+    ar -t libPlus.a
+
+Output:
+
+    __.SYMDEF
+    parse.o
+    add.o
+    print.o
+
+The __.SYMDEF entry is the archive symbol index created on macOS.
+
+Command:
+
+    ./plus 3 7
+
+Output:
+
+    3+7=10
+
+Command:
+
+    make
+
+Output:
+
+    make: Nothing to be done for `all'.
+
+The second make command did not rebuild anything because none of the
+source files had changed. The Makefile also has a clean target that
+removes the object files, static library, and executable.

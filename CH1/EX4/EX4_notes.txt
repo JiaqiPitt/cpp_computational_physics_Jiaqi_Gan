@@ -1,0 +1,40 @@
+Exercise 4
+==========
+
+I compiled the foo program and tested how zsh handles the wildcard
+character `*`.
+
+Command:
+
+    ./foo A B C D
+
+Output:
+
+    zsh: no such file or directory: ./foo
+
+This failed because I was in my home directory, while the executable was
+stored in CH1/EX4. The path `./foo` only refers to a file named foo in the
+current directory.
+
+Command:
+
+    "/Users/jiaqigan/Documents/Computational Physics/week_1/CH1/EX4/foo" *
+
+Output:
+
+    /Users/jiaqigan/Documents/Computational Physics/week_1/CH1/EX4/foo Applications Desktop Documents Downloads Library Movies Music Pictures Public
+
+Before foo started, zsh expanded `*` into the visible files and directories
+in my home directory. Each name became a separate command-line argument.
+Hidden files were not included.
+
+Command:
+
+    "/Users/jiaqigan/Documents/Computational Physics/week_1/CH1/EX4/foo" "*"
+
+Output:
+
+    /Users/jiaqigan/Documents/Computational Physics/week_1/CH1/EX4/foo *
+
+Putting `*` inside quotation marks prevented wildcard expansion, so foo
+received and printed the literal star character.

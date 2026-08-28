@@ -1,0 +1,4 @@
+legendre
+hermite
+*.o
+*.dSYM/
