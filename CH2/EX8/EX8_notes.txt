@@ -1,0 +1,18 @@
+Exercise 8
+==========
+
+Checked sin(ix) = i*sinh(x) and cos(ix) = cosh(x) with std::complex, just
+called std::sin/std::cos/std::sinh/std::cosh directly.
+
+Tested x = 0, 0.5, 1, 2, -1.5. Every single row matched to 6 decimals,
+imaginary part of cos(ix) was always 0 (sometimes prints as -0.000000,
+that's just negative zero, still zero).
+
+Also swept x from -3 to 3 in steps of 0.05, wrote it to
+identities_data.csv, plotted Im(sin(ix)) against sinh(x) and Re(cos(ix))
+against cosh(x) in plot_identities.py -> identities.png. Drew the "true"
+curve as a thick gray line and the complex version as a thin dashed line
+on top - if they didn't match you'd see the dashed line poke out, but it
+just disappears into the gray line the whole way from -3 to 3.
+
+Jiaqi Gan, Sep 4, 2026

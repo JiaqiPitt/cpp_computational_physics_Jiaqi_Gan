@@ -1,0 +1,62 @@
+Exercise 2
+==========
+
+I computed the relativistic stretch-factor gamma two different ways and
+compared them as beta gets closer and closer to 1. The direct formula is
+gamma = 1/sqrt(1 - beta^2), and the "stable" formula rewrites 1 - beta^2 as
+(1-beta)(1+beta) = eps*(2-eps), where eps = 1 - beta. I fed in
+eps = 1e-1, 1e-2, ..., down to 1e-16 and used the stable double-precision
+result as the reference to measure the fractional error of the direct
+method against. Full output of the program is saved in gamma_table.txt,
+here's the actual data (copy-pasted straight from the terminal):
+
+i     epsilon             beta                    gamma_direct            gamma_stable            frac_error          gamma_direct_f          frac_error_f
+1     1.0000000000e-01    9.0000000000e-01        2.2941573387e+00        2.2941573387e+00        0.0000000000e+00    2.2941572666e+00        3.1422777982e-08
+2     1.0000000000e-02    9.9000000000e-01        7.0888120501e+00        7.0888120501e+00        3.7587895409e-16    7.0888152122e+00        4.4607846489e-07
+3     1.0000000000e-03    9.9900000000e-01        2.2366272042e+01        2.2366272042e+01        3.1768492059e-16    2.2366415024e+01        6.3927360905e-06
+4     1.0000000000e-04    9.9990000000e-01        7.0712445952e+01        7.0712445952e+01        5.5064906037e-14    7.0706581116e+01        8.2939235097e-05
+5     1.0000000000e-05    9.9999000000e-01        2.2360735677e+02        2.2360735677e+02        2.2755685291e-12    2.2345567322e+02        6.7834776766e-04
+6     1.0000000000e-06    9.9999900000e-01        7.0710695795e+02        7.0710695796e+02        1.4377843016e-11    7.0245837402e+02        6.5740888101e-03
+7     1.0000000000e-07    9.9999990000e-01        2.2360680340e+03        2.2360680334e+03        2.6317783528e-10    2.0480002441e+03        8.4106470130e-02
+8     1.0000000000e-08    9.9999999000e-01        7.0710678118e+03        7.0710678295e+03        2.5123797044e-09    inf                     inf
+9     1.0000000000e-09    9.9999999900e-01        2.2360680097e+04        2.2360679781e+04        1.4140966094e-08    inf                     inf
+10    1.0000000000e-10    9.9999999990e-01        7.0710675195e+04        7.0710678120e+04        4.1370182931e-08    inf                     inf
+11    1.0000000000e-11    9.9999999999e-01        2.2360678850e+05        2.2360679775e+05        4.1370182859e-08    inf                     inf
+12    1.0000000000e-12    1.0000000000e+00        7.0711460253e+05        7.0710678119e+05        1.1061043578e-05    inf                     inf
+13    1.0000000000e-13    1.0000000000e+00        2.2357204113e+06        2.2360679775e+06        1.5543634543e-04    inf                     inf
+14    1.0000000000e-14    1.0000000000e+00        7.0738953809e+06        7.0710678119e+06        3.9987864526e-04    inf                     inf
+15    1.0000000000e-15    1.0000000000e+00        2.2369621333e+07        2.2360679775e+07        3.9987864526e-04    inf                     inf
+16    1.0000000000e-16    1.0000000000e+00        6.7108864000e+07        7.0710678119e+07        5.0937343757e-02    inf                     inf
+
+(beta prints as exactly 1.0000000000e+00 from row 12 onward - that's just
+double running out of bits to represent "1 minus something tiny" as
+distinct from 1. gamma_direct still keeps changing after that point though,
+because 1.0 - beta*beta isn't necessarily exactly zero even when beta itself
+displays as 1.0, it depends on the last few bits that don't show up when
+printed with only 10 digits)
+
+With double, the direct formula actually holds up a lot longer than I
+expected. The fractional error stays under 1e-3 all the way down to
+eps = 1e-15, and only blows up at eps = 1e-16 (error jumps to about 5%).
+So the max beta you can use the naive formula for, if you need 0.1%
+accuracy, is roughly beta = 1 - 1e-15 in double precision.
+
+Then I added a float version of the direct formula just to see how much
+worse it is, and it's pretty dramatic. The error crosses the 1e-3 line
+between eps = 1e-5 (still fine, 6.8e-4) and eps = 1e-6 (blows past it,
+6.6e-3). So with float you only get to beta ~ 1 - 1e-5 before you lose the
+required accuracy - about ten orders of magnitude earlier than double.
+And once eps gets below float's machine epsilon (~1.19e-7, this is the same
+number from exercise 1), 1 - eps just rounds to exactly 1.0f, so
+1 - beta_f*beta_f becomes exactly 0 and the whole thing turns into inf.
+That's not really "losing accuracy" anymore, it's losing all the
+significant digits at once.
+
+Basically this is the same catastrophic cancellation problem from Taylor
+series work in Chapter 1 - subtracting two nearly-equal floating point
+numbers (1 and beta^2) wipes out the digits that actually mattered. The
+stable formula never subtracts two close numbers like that (eps is given
+directly, not computed by subtraction), so gamma_stable never showed any
+blow-up in the table, not even at eps = 1e-16.
+
+Jiaqi Wed Sep 2, 2026

@@ -1,0 +1,69 @@
+Exercise 7
+==========
+
+This is a 1D step potential scattering problem. Region I (x<0) is free,
+region II (x>=0) has height V. Set hbar=1, 2m=1 so k1=sqrt(E) and
+k2=sqrt(E-V), using std::complex for k2 so it automatically comes out real
+when E>V and purely imaginary when E<V - never had to write an if/else for
+the two energy regimes, which was the whole point of the exercise. Matched
+psi and psi' at x=0 and solved the usual two equations for B and C:
+
+B = (k1-k2)/(k1+k2)
+C = 2*k1/(k1+k2)
+R = |B|^2
+T = (Re(k2)/k1)*|C|^2
+
+I ran it for E=1 fixed and V/E from 0 up to 3. Data (from barrier, R+T column
+added by the program itself as a sanity check):
+
+V/E, R, T, R+T
+0.000000, 0.000000, 1.000000, 1.000000
+0.250000, 0.005155, 0.994845, 1.000000
+0.500000, 0.029437, 0.970563, 1.000000
+0.750000, 0.111111, 0.888889, 1.000000
+0.900000, 0.269874, 0.730126, 1.000000
+0.950000, 0.402605, 0.597395, 1.000000
+0.990000, 0.669421, 0.330579, 1.000000
+1.000000, 1.000000, 0.000000, 1.000000
+1.500000, 1.000000, 0.000000, 1.000000
+2.000000, 1.000000, 0.000000, 1.000000
+3.000000, 1.000000, 0.000000, 1.000000
+
+R+T=1 every single row, so conservation checks out and I'm fairly confident
+the complex algebra is right.
+
+The part that surprised me is V/E=1 giving R=1, T=0 exactly, not
+some smooth number in between. At E=V, k2=0, so the "transmitted" wave in
+region II is just a flat constant C, not travelling anywhere, so it carries
+zero probability current even though it has a nonzero amplitude sitting
+there. I added a few extra points close to the threshold (0.9, 0.95, 0.99)
+just to check this wasn't some discontinuity/bug - it's not, R climbs
+continuously and pretty steeply from 0.11 at 0.75 up to 1.0 right at V=E,
+it's just a sharp rise, not a jump. Apparently this is a known thing called
+threshold reflection - even though classically a particle with E>V always
+gets through, quantum mechanically the reflection probability goes all the
+way to 1 as you approach E=V from above.
+
+Also I tested the actual wavefunction for two cases (V/E=0.5 and V/E=2.0),
+step size 0.05 from x=-10 to 10, written straight to CSV files from the
+program using ofstream (wavefunction_above.csv, wavefunction_below.csv),
+then plotted with plot_wavefunctions.py -> wavefunctions.png. Things that
+match what they should:
+
+- For V/E=0.5 (E>V), |psi|^2 oscillates in region I (interference between
+  incident and reflected wave) but is a flat constant in region II - makes
+  sense, only one travelling wave there, nothing to interfere with itself.
+  Checked the flat value against T*k1/Re(k2): comes out to 1.3726, matches
+  the CSV exactly.
+- For V/E=2.0 (E<V), region II decays like exp(-2*kappa*x) with
+  kappa=sqrt(V-E)=1. Checked: |psi(1)|^2/|psi(0)|^2 = 0.2707/2.0 = 0.1353,
+  and exp(-2) = 0.1353. Matches.
+- psi and its value at x=0 line up between the two region formulas in both
+  cases, so the boundary matching in the code is doing what it's supposed to.
+
+Added a V(x) step and a horizontal E line to the plot so you can actually
+see whether the energy line sits above or below the barrier top, which
+makes the E>V vs E<V distinction obvious at a glance instead of just
+inferring it from V/E.
+
+Jiaqi Gan, Sep 4, 2026
