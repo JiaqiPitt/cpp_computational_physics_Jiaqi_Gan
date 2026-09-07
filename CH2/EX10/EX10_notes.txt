@@ -1,0 +1,21 @@
+Exercise 10
+===========
+
+The function diagonalize() takes a plain std::complex<double> M[3][3], copies it into an
+Eigen::Matrix3cd, runs Eigen::ComplexEigenSolver on it, then copies the
+eigenvalues/eigenvectors back out into plain arrays. 
+
+I ran it on the given matrix:
+
+  0.333333  -0.244017   0.910684
+  0.910684   0.333333  -0.244017
+ -0.244017   0.910684   0.333333
+
+Checked that against the eigenvector for eigenvalue 1 - all three rows came
+out identical:
+
+(-0.566785,-0.109948)
+(-0.566785,-0.109948)
+(-0.566785,-0.109948)
+
+Jiaqi Gan, Sep 7, 2026
