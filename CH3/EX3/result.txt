@@ -1,0 +1,10 @@
+Record:
+
+NaN showed up first try at V0/E=0.5 and 1.0 exactly and I think those are the points
+where one of the k's inside the barrier hits exactly zero, and my stepBack
+formula divides by k_left, so it blows up right at those two values. Fixed
+by just not testing those exact ratios.
+
+I feel the interesting part is that at V0/E=0.3 (barrier top 2V0 still below E), T is not
+monotonic in ka, it oscillates while the resonance peaks near ka=1.7 and again past
+ka=2.9, going almost to T=1 at the peaks. 

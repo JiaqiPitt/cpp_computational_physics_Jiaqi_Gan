@@ -1,0 +1,3 @@
+volume = 9
+
+triple product and determinant both gave 9.000000, match exactly
