@@ -1,0 +1,37 @@
+Exercise 8
+==========
+
+The photo of Fig. 4.6 was taken at an angle and the page wasn't flat, so the
+plot frame came out as a slightly curved trapezoid. Reading coordinates straight
+off the photo would have been off by a lot near the corners.
+
+While looking at the tick marks I noticed the x axis is not linear in
+wavelength. 400->500 nm is about 645 pixels but 500->600 nm is only about 430,
+ratio 1.5, which is exactly (1/400-1/500)/(1/500-1/600). So the axis is linear
+in 1/lambda (wavenumber) and just labeled in nm. Fitting the tick positions
+linear in 1/lambda gave 1.6 px rms, linear in lambda gave 157 px.
+
+rectify_figure.py finds the frame and all the tick marks on the four edges
+(370-680 nm every 10 nm, absorbance 0-100 every 10), fits 1/lambda and
+absorbance as cubic polynomials of pixel position, and resamples the photo into
+fig_4_6_rectified.png where x is linear in wavelength (0.25 nm/px) and y is
+linear in absorbance (0.1/px). Residual at the ticks was about 0.6 nm and 0.08
+in absorbance. As a check that wasn't part of the fit, the lines at 420, 498,
+534 and 564 nm go right through the peak arrows printed on the figure.
+
+Then I clicked the markers with digitize.py, one curve at a time:
+blue 17 points, rods 21, green 26, red 28. Almost every point landed within
+about 1 nm of a multiple of 10 nm, which is how the original data was sampled.
+Around 400-420 nm the rod, green and red markers sit on top of each other and
+at 410 nm I couldn't tell which marker belongs to the red curve, so red has no
+410 point and the spline fills that gap.
+
+For part b, Photoreceptor reads a curve file and interpolates it with a cubic
+spline (Qat InterpolatingFunction). Past the last measured point the spline
+extrapolates linearly, which would go negative, so I clip the response at 0.
+The four curves are plotted together in photoreceptor_response.png. Evaluated at
+the published peaks the response comes out 100.0 (blue, 420), 100.4 (rods,
+498), 100.9 (green, 534) and 100.4 (red, 564), which is what you'd expect for
+normalized absorbance.
+
+Jiaqi Gan, Sep 22, 2026
