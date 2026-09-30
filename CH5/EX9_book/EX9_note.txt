@@ -1,0 +1,42 @@
+Exercise 5.9 notes Jiaqi Gan, Sep 29, 2026
+
+The book's rule is Eq. 5.15, J = (n+1/2)h. In practice it is Eq. 5.16:
+2 * integral sqrt(2m(E-V)) dx = (n+1/2)h, taken between the two turning points. 
+The book says this is for vibrational motion in one dimension. Charmonium is a radial problem, 
+so I had to decide how to apply it.
+
+Setup. Two quarks of 1370 MeV give a reduced mass mu = 685 MeV. I used MeV and fm with hbar c = 197.327 MeV fm, 
+which gives
+  V(r) = -99.9790 MeV fm / r + 858.225 MeV/fm * r
+The linear coefficient 1/(hbar c a^2) = 858 MeV/fm is the usual string tension (about 0.17 GeV^2), so the numbers 
+look reasonable. For l > 0 I add the centrifugal term (hbar c)^2 L2 / (2 mu r^2).
+
+Why I use the Langer correction. My first try was Eq. 5.16 with L2 = l(l+1). For l = 0 there is then no centrifugal term, 
+and the -1/r term sends the inner turning point to r = 0. That is not a smooth turning point, but the n+1/2 in Eq. 5.16 assumes 
+smooth turning points at both ends. The 1S energy came out as -182 MeV, clearly wrong. The standard fix for radial WKB is to 
+replace l(l+1) with (l+1/2)^2 (the Langer correction). With it, even l = 0 gets a small 1/r^2 barrier, the inner turning point becomes smooth, 
+and I can keep the book's n+1/2 for every l. I took this to be the "appropriate" rule the problem asks for.
+
+Numerics (Qat):
+- WKBAction is an AbsFunction of E. It uses Bisection to find the minimum of Veff, then the two turning points on either side, and returns (1/(pi hbar c)) * integral p dr.
+- The integrand behaves like sqrt(r - r1) at the ends, so I substituted r = r1 + (r2-r1)(1-cos t)/2. That makes the integrand smooth in t, and I integrated it with SimpleIntegrator and MidpointRule, 2000 intervals.
+- A second Bisection solves action(E) = n + 1/2.
+
+Results:
+
+state     l   E Langer (MeV)   E l(l+1) (MeV)     mass (MeV)
+   1S     0           340.55          -182.37         3080.5
+   2S     0           932.01           716.96         3672.0
+   3S     0          1367.14          1203.84         4107.1
+   1P     1           758.82           730.60         3498.8
+   2P     1          1214.38          1192.86         3954.4
+   3P     1          1598.69          1580.41         4338.7
+
+The column l(l+1) is the uncorrected version, kept for comparison. Without the correction the S states are off by 160-520 MeV. 
+The P states change by only 20-30 MeV, because for l = 1 the barrier is already there and (l+1/2)^2 = 2.25 is close to l(l+1) = 2.
+
+The excitation energies are several hundred MeV, a large fraction of the 2740 MeV rest energy of the two quarks, as part (c) says. 
+The masses (2 m_c c^2 + E) come out close to the real states: 1S 3080 against J/psi 3097, 2S 3672 against psi(2S) 3686, and 1P 3499, 
+which sits inside the chi_c states around 3415-3556 MeV. That is good agreement for such a simple potential with spinless quarks.
+
+Plot: charmonium_levels.png shows the six masses as an energy level diagram, S states on the left and P states on the right.

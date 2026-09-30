@@ -1,0 +1,89 @@
+#include <cmath>
+#include <stdexcept>
+inline MuellerMatrix::MuellerMatrix():a{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}} {}
+
+inline MuellerMatrix::MuellerMatrix(MuellerMatrix::Type type):MuellerMatrix() {
+
+  if (type==Horizontal)          *this=LinearPolarizer(0.0);
+  else if (type==Vertical)       *this=LinearPolarizer(M_PI/2);
+  else if (type==Diagonal)       *this=LinearPolarizer(M_PI/4);
+  else if (type==Antidiagonal)   *this=LinearPolarizer(-M_PI/4);
+  else if (type==Right) {
+    // passes right circular light (S3=+1), blocks left
+    double m[4][4]={{0.5,0,0,0.5},{0,0,0,0},{0,0,0,0},{0.5,0,0,0.5}};
+    *this=MuellerMatrix(m);
+  }
+  else if (type==Left) {
+    double m[4][4]={{0.5,0,0,-0.5},{0,0,0,0},{0,0,0,0},{-0.5,0,0,0.5}};
+    *this=MuellerMatrix(m);
+  }
+  else if (type==Identity) {}
+  else if (type==FastHorizontal) {
+    // quarter wave plate, Jones matrix diag(1, i)
+    double m[4][4]={{1,0,0,0},{0,1,0,0},{0,0,0,-1},{0,0,1,0}};
+    *this=MuellerMatrix(m);
+  }
+  else if (type==FastVertical) {
+    // quarter wave plate, Jones matrix diag(1, -i)
+    double m[4][4]={{1,0,0,0},{0,1,0,0},{0,0,0,1},{0,0,-1,0}};
+    *this=MuellerMatrix(m);
+  }
+  else if (type==Depolarizer) {
+    double m[4][4]={{1,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+    *this=MuellerMatrix(m);
+  }
+
+}
+
+inline MuellerMatrix::MuellerMatrix(const double (&m)[4][4]) {
+  for (int i=0;i<4;i++) for (int j=0;j<4;j++) a[i][j]=m[i][j];
+}
+
+inline MuellerMatrix MuellerMatrix::LinearPolarizer(double theta) {
+  double c=std::cos(2*theta), s=std::sin(2*theta);
+  // cos(pi/2) etc. come out as ~1e-17; set them to exactly zero
+  if (std::fabs(c)<1e-15) c=0.0;
+  if (std::fabs(s)<1e-15) s=0.0;
+  double m[4][4]={{0.5,   0.5*c,   0.5*s,   0},
+                  {0.5*c, 0.5*c*c, 0.5*c*s, 0},
+                  {0.5*s, 0.5*c*s, 0.5*s*s, 0},
+                  {0,     0,       0,       0}};
+  return MuellerMatrix(m);
+}
+
+inline double & MuellerMatrix::operator () (unsigned int i, unsigned int j) {
+  if (i>3 || j>3) throw std::range_error("Index out of range");
+  return a[i][j];
+}
+
+inline const double & MuellerMatrix::operator () (unsigned int i, unsigned int j) const {
+  if (i>3 || j>3) throw std::range_error("Index out of range");
+  return a[i][j];
+}
+
+inline std::ostream & operator << (std::ostream & o, const MuellerMatrix & m) {
+  o << "[";
+  for (int i=0;i<4;i++) {
+    if (i>0) o << " ";
+    for (int j=0;j<4;j++) o << " " << m(i,j);
+    if (i<3) o << std::endl;
+  }
+  return o << "]";
+}
+
+inline MuellerMatrix operator* (const MuellerMatrix & m1, const MuellerMatrix & m2) {
+  MuellerMatrix m;
+  for (int i=0;i<4;i++) for (int j=0;j<4;j++) {
+    m(i,j)=0.0;
+    for (int k=0;k<4;k++) m(i,j)+=m1(i,k)*m2(k,j);
+  }
+  return m;
+}
+
+inline StokesVector operator* (const MuellerMatrix & m, const StokesVector & v) {
+  StokesVector r;
+  for (int i=0;i<4;i++) {
+    for (int k=0;k<4;k++) r(i)+=m(i,k)*v(k);
+  }
+  return r;
+}

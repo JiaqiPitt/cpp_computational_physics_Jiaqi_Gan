@@ -1,0 +1,92 @@
+Note: Jiaqi Gan, Sep 29, 2026   
+
+I reused phi_n(x) from 5.6 and wrote each operator as a function acting on phi_j: X*phi(j), X*X*phi(j), phi(j).prime() for D, and two .prime() calls for D^2. 
+Then (A)_ij = <phi_i|A phi_j> is a Gauss-Hermite integral as in 5.6, done for i, j = 0..4.
+
+Number of points. After taking out exp(-x^2), the integrand is a polynomial, so I worked out its degree for each operator:
+  x:   i+j+1 <= 9   -> 5 points
+  x^2: i+j+2 <= 10  -> 6 points
+  D:   phi_j' = exp(-x^2/2)(H_j' - x H_j), degree <= 9 -> 5 points
+  D^2: degree <= 10 -> 6 points
+To check, I compared each matrix with n points against 30 points:
+
+ points           x         x^2           D         D^2           H
+      1    1.41e+00    4.50e+00    1.73e+00    5.51e+00    3.50e+00
+      2    1.22e+00    4.42e+00    2.02e+00    4.08e+00    3.75e+00
+      3    1.41e+00    3.75e+00    1.41e+00    5.20e+00    3.90e+00
+      4    1.41e+00    4.50e+00    1.41e+00    4.50e+00    4.50e+00
+      5    1.60e-14    2.50e+00    1.04e-14    2.50e+00    2.64e-14
+      6    1.42e-14    5.33e-14    7.11e-15    2.84e-14    2.62e-14
+      7    2.66e-14    9.95e-14    9.33e-15    3.46e-14    5.15e-14
+      8    2.89e-14    1.31e-13    9.99e-15    2.35e-14    6.04e-14
+
+This matches the degree count. I didn't expect H to be exact with only 5 points, since x^2 and D^2 each need 6. The reason is that H phi_j = (j+1/2) phi_j, 
+so <phi_i|H phi_j> only has degree i+j <= 8; the degree-10 parts of -D^2/2 and x^2/2 cancel. For the matrices below I used 10 points to be safe.
+
+(a) x
+   0.000000   0.707107   0.000000   0.000000   0.000000
+   0.707107   0.000000   1.000000   0.000000   0.000000
+   0.000000   1.000000   0.000000   1.224745   0.000000
+   0.000000   0.000000   1.224745   0.000000   1.414214
+   0.000000   0.000000   0.000000   1.414214   0.000000
+
+Only the elements next to the diagonal are nonzero, and x_{n-1,n} = sqrt(n/2). So x only connects n to n±1.
+
+(b) x^2
+   0.500000   0.000000   0.707107   0.000000   0.000000
+   0.000000   1.500000   0.000000   1.224745   0.000000
+   0.707107   0.000000   2.500000   0.000000   1.732051
+   0.000000   1.224745   0.000000   3.500000   0.000000
+   0.000000   0.000000   1.732051   0.000000   4.500000
+
+x * x (square of the 5x5 matrix from (a)):
+   0.500000   0.000000   0.707107   0.000000   0.000000
+   0.000000   1.500000   0.000000   1.224745   0.000000
+   0.707107   0.000000   2.500000   0.000000   1.732051
+   0.000000   1.224745   0.000000   3.500000   0.000000
+   0.000000   0.000000   1.732051   0.000000   2.000000
+
+Everything agrees except the (4,4) element: 4.5 against 2.0. The difference is 2.5. The real matrix product is a sum over all intermediate states:
+  (x^2)_44 = sum_k x_4k x_k4 = x_43^2 + x_45^2 = 2 + 2.5 = 4.5.
+In the 5x5 matrix the sum stops at k = 4, so the x_45^2 = 5/2 term is lost. Truncating and then multiplying is not the same as multiplying and then 
+truncating. Only the last row and column are affected, because x only reaches one step up.
+
+(c) D
+   0.000000   0.707107   0.000000   0.000000   0.000000
+  -0.707107   0.000000   1.000000   0.000000   0.000000
+   0.000000  -1.000000   0.000000   1.224745   0.000000
+   0.000000   0.000000  -1.224745   0.000000   1.414214
+   0.000000   0.000000   0.000000  -1.414214   0.000000
+
+Same pattern as x, except D is antisymmetric (D_ji = -D_ij). That fits, because d/dx is anti-Hermitian (integrate by parts).
+
+D^2
+  -0.500000   0.000000   0.707107   0.000000   0.000000
+   0.000000  -1.500000   0.000000   1.224745   0.000000
+   0.707107   0.000000  -2.500000   0.000000   1.732051
+   0.000000   1.224745   0.000000  -3.500000   0.000000
+   0.000000   0.000000   1.732051   0.000000  -4.500000
+
+D * D
+  -0.500000   0.000000   0.707107   0.000000   0.000000
+   0.000000  -1.500000   0.000000   1.224745   0.000000
+   0.707107   0.000000  -2.500000   0.000000   1.732051
+   0.000000   1.224745   0.000000  -3.500000   0.000000
+   0.000000   0.000000   1.732051   0.000000  -2.000000
+
+The same thing happens here: only (4,4) differs, -4.5 against -2.0, because the k = 5 term D_45 D_54 = -2.5 is missing.
+
+(d) H = -1/2 D^2 + 1/2 x^2
+   0.500000   0.000000   0.000000   0.000000   0.000000
+   0.000000   1.500000   0.000000   0.000000   0.000000
+   0.000000   0.000000   2.500000   0.000000   0.000000
+   0.000000   0.000000   0.000000   3.500000   0.000000
+   0.000000   0.000000   0.000000   0.000000   4.500000
+
+This makes sense. H is diagonal with entries n + 1/2, which are the oscillator energies in these units. 
+It has to be diagonal because the phi_n are eigenfunctions of H. The off-diagonal elements of -D^2/2 and x^2/2 cancel exactly, 
+and the diagonals add: 0.5*(n+1/2) + 0.5*(n+1/2).
+
+As a check I also built H from the truncated products, -1/2 D*D + 1/2 x*x. Rows 0-3 are the same, but (4,4) comes out 2.0, not 4.5. 
+So to get the right H in a finite basis I have to compute x^2 and D^2 directly, not square the truncated x and D.
+

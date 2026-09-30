@@ -1,0 +1,50 @@
+Exercise 6.4 notes
+
+I kept the layout of the Jones calculus example from Chapter 6 (ACP-Examples/CH6/JONESCALC, the example code that comes with the textbook): a MUELLERCALC directory with StokesVector.h/.icc and MuellerMatrix.h/.icc, everything inline, and the same Type names (Horizontal, Vertical, Diagonal, Antidiagonal, Right, Left, Identity, FastHorizontal, FastVertical). I added a few things that only make sense with Stokes vectors: an Unpolarized type, operator+ for adding two incoherent beams, degreeOfPolarization(), a Depolarizer, and LinearPolarizer(theta) for any angle.
+
+Convention: S0 = intensity, S1 = H - V, S2 = D - A, S3 = R - L. I chose the sign of S3 so that JonesVector::Right in the JONESCALC code, (1, i)/sqrt(2), gives S3 = +1. I got the quarter wave plate matrices by working out what Jones diag(1, i) and diag(1, -i) do to S2 and S3 (a +-90 degree rotation in the S2-S3 plane).
+
+Test output:
+
+1. Circular polarizer PH*DG*PV (same as the Jones example)
+Filter=
+[ 0.5 0 0 0.5
+  0 0 0 0
+  0 0 0 0
+  0.5 0 0 0.5]
+Horizontal in:  [1,1,0,0]  out: [0.5,0,0,0.5]  intensity= 0.5  DOP= 1
+Unpolarized in: [1,0,0,0]  out: [0.5,0,0,0.5]  intensity= 0.5  DOP= 1
+
+With H light in, I get the same answer as the JONESCALC example: intensity 0.5, right circular. Unpolarized light can't be put into the Jones program at all. Here it also comes out fully right circular with intensity 0.5, because the diagonal polarizer passes half of it and the wave plate after it turns that into circular light.
+
+2. Partially polarized beam 0.5*H + 0.5*unpolarized = [1,0.5,0,0]  DOP= 0.5
+through H polarizer: intensity= 0.75
+through V polarizer: intensity= 0.25
+
+A partially polarized beam is just a sum of Stokes vectors. The H polarizer passes all of the polarized half and half of the unpolarized half: 0.5 + 0.25 = 0.75. The V polarizer passes only 0.25.
+
+3. Linear polarizer at angle theta
+   theta    H light out  cos^2 theta  unpolarized out
+       0       1.000000     1.000000         0.500000
+      15       0.933013     0.933013         0.500000
+      30       0.750000     0.750000         0.500000
+      45       0.500000     0.500000         0.500000
+      60       0.250000     0.250000         0.500000
+      75       0.066987     0.066987         0.500000
+      90       0.000000     0.000000         0.500000
+
+Malus's law holds exactly, and unpolarized light always loses half.
+
+4. Unpolarized light through polarizers
+H then V:        intensity= 0
+H then D then V: intensity= 0.125
+
+Crossed polarizers block everything. A 45 degree polarizer placed between them lets 1/2 * 1/2 * 1/2 = 1/8 through.
+
+5. Circular polarizers and depolarizer
+R light through R polarizer: intensity= 1
+L light through R polarizer: intensity= 0
+R light through L polarizer: intensity= 0
+H light through depolarizer: [1,0,0,0]  DOP= 0
+
+One small fix: LinearPolarizer(pi/4) at first gave entries like 3e-17 because cos(pi/2) isn't exactly 0 in floating point. I set anything below 1e-15 to zero so the printed matrices are clean.

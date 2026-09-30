@@ -1,0 +1,63 @@
+Note: Jiaqi Gan, Sep 29, 2026
+
+I built phi_n(x) straight from Eq. 5.69, using Qat's HermitePolynomial times exp(-x^2/2) and the normalization factor. 
+For <phi_i|phi_j> I used GaussHermiteRule with GaussIntegrator in INTEGRATE_DX mode, so what I integrate is phi_i*phi_j itself.
+
+Before running it I worked out how many points I should need. The product phi_i*phi_j has exp(-x^2), which is exactly the Hermite weight, 
+times H_i*H_j, a polynomial of degree i+j. An n-point rule is exact up to degree 2n-1. The highest degree here is 5+5 = 10, so I need n = 6.
+
+To check, I ran the rule from 1 to 10 points and printed max|A - I|:
+
+ points   max|A - I|   worst element
+      1    1.000e+00      (1,1)
+      2    1.000e+00      (2,2)
+      3    1.000e+00      (3,3)
+      4    1.000e+00      (4,4)
+      5    1.000e+00      (5,5)
+      6    4.885e-15      (5,5)
+      7    5.995e-15      (4,4)
+      8    1.155e-14      (5,5)
+      9    2.531e-14      (5,5)
+     10    2.043e-14      (5,5)
+
+From 1 to 5 points the error was exactly 1, always at the diagonal element (n,n). At 6 points and above it fell to about 1e-15, which is just roundoff. So the minimum is 6 points, matching the estimate.
+
+Matrix with 6 points (i, j = 0..5):
+
+  1.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  1.00000000  0.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  1.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  1.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  0.00000000  1.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  1.00000000
+
+This is the identity matrix, so the phi_n are orthonormal.
+
+Matrix with 5 points:
+
+  1.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  1.00000000  0.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  1.00000000  0.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  1.00000000  0.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  0.00000000  1.00000000  0.00000000
+  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000  0.00000000
+
+(Values smaller than 5e-15 are printed as 0.)
+
+The 5-point case surprised me at first. Every element was right except A_55, and that one came out as exactly 0, not something close to 1.
+A too-coarse rule should give a wrong number, not zero, so I wanted to see why. The quadrature is a sum of w_k * phi_5(x_k)^2, and the weights are positive. 
+For the sum to be zero, phi_5 would have to be zero at every node. To check this I printed the 5 nodes and evaluated H_5 at each one:
+
+   k            x_k       H_5(x_k)
+   0    -2.02018287     -7.474e-13
+   1    -0.95857246     -1.012e-13
+   2     0.00000000      0.000e+00
+   3     0.95857246      1.012e-13
+   4     2.02018287      7.474e-13
+
+H_5 is zero at every node, apart from roundoff. That makes sense: H_5(x) = 32x^5 - 160x^3 + 120x = 8x(4x^4 - 20x^2 + 15), and its roots are 0, ±0.9586 and ±2.0202, 
+the same five numbers. The n nodes of an n-point Gauss-Hermite rule are the zeros of H_n. With 5 points the rule samples phi_5 only where it vanishes, so it can't 
+see phi_5 at all and gives A_55 = 0.
+
+One problem with the code: I first had phi() return GENFUNCTION. That type is a const reference, so it pointed at a temporary and the program crashed. Returning auto, 
+so the function object is returned by value, fixed it.
