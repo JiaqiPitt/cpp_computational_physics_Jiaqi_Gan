@@ -1,0 +1,19 @@
+Exercise 7.2 notes
+
+With u = v / sqrt(kT/m) the distribution becomes
+  rho(u) = sqrt(2/pi) u^2 exp(-u^2/2).
+Changing to y = u^2/2 (kinetic energy in units of kT) gives
+  rho(y) = y^(1/2) exp(-y) / Gamma(3/2),
+which is a gamma distribution with shape 3/2 and scale 1. So I drew y from std::gamma_distribution(1.5, 1.0) and set u = sqrt(2y).
+
+I used 100000 samples (seed 12345) and filled a Hist1D with 100 bins from 0 to 5. The curve on the plot is rho(u) times N times the bin width.
+
+Output:
+samples: 100000, overflow (u > 5.0): 1
+<u>   = 1.5904 +- 0.0021   exact sqrt(8/pi) = 1.5958
+<u^2> = 2.9799 +- 0.0077   exact 3
+chi^2 / ndof = 93.4 / 87
+
+The histogram follows the curve over the whole range, and chi^2/ndof is about 1. Both means are a bit low, about 2.5 sigma. I tried a few other seeds and the means came out on both sides of the exact values, so I think it's just this seed.
+
+Plot: maxwell_gamma.png

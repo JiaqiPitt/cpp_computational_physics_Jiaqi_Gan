@@ -1,0 +1,31 @@
+Exercise 7.3 notes
+
+I ran a Metropolis chain in 3D velocity space, in units of sqrt(kT/m), with target exp(-|u|^2/2). Each step adds a Gaussian random number of width STEP to every component, and the move is accepted with probability min(1, exp(-(|u'|^2 - |u|^2)/2)). The speed |u| then follows the Maxwell distribution, and each component should be a unit Gaussian.
+
+Settings: seed 12345, 1000 burn-in steps, then 100000 samples recorded every 10 steps. The errors on the means come from 100 batch means, since neighbouring samples are correlated.
+
+To choose STEP I tried a few values and looked at the correlation between neighbouring recorded speeds:
+
+ STEP   acceptance   lag-1 corr   chi^2/87
+ 0.5      0.69         0.31         58
+ 1.0      0.45         0.15        101
+ 1.5      0.28         0.20        116
+ 2.0      0.18         0.33        164
+ 2.5      0.12         0.48        185
+
+With small steps almost every move is accepted but the chain moves slowly. With big steps most moves are rejected. STEP = 1.0 gave the lowest correlation, so I used that.
+
+Output with STEP = 1.0:
+proposal width 1.00, acceptance rate 0.450
+recorded 100000 samples, one every 10 steps, after 1000 burn-in steps
+lag-1 correlation of recorded speeds: 0.151
+<u>   = 1.5961 +- 0.0027   exact sqrt(8/pi) = 1.5958
+<u^2> = 3.0033 +- 0.0102   exact 3
+speed histogram chi^2 / ndof = 101.0 / 87
+
+Both means agree with the exact values within 1 sigma. chi^2/ndof is 1.16, a little above 1. That fits with the samples still being slightly correlated, because chi^2 assumes independent entries.
+
+Plots:
+  maxwell_mcmc_speed.png       speed histogram with the Maxwell curve
+  maxwell_mcmc_components.png  u_x, u_y, u_z with a unit Gaussian
+All three components land on the same Gaussian.

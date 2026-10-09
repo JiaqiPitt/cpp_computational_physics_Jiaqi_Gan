@@ -1,0 +1,35 @@
+Exercise 7.12 notes
+
+x is uniform on [0,1], so the density of y = f(x) is rho(y) = |dx/dy|. For each transformation I solved for x(y) and took the derivative. Both use 10^6 samples, seed 12345.
+
+
+Transformation 1: y = x_min (x_max/x_min)^x, with x_min = 1, x_max = 10
+
+x = ln(y/x_min) / ln(x_max/x_min), so
+  rho(y) = 1 / (y ln(x_max/x_min)),  x_min <= y <= x_max.
+This is a 1/y (log-uniform) distribution.
+
+Transformation 1: y = xmin (xmax/xmin)^x, xmin = 1, xmax = 10
+  underflow 0, overflow 0
+  chi^2 / ndof = 76.5 / 90
+
+The histogram falls by a factor 10 from y = 1 to y = 10, as 1/y should.
+Plot: transform_powerlaw.png
+
+
+Transformation 2: y = sqrt(M^2 + M Gamma tan(M Gamma x)), with M = 100, Gamma = 10
+
+With s = y^2 and theta = M Gamma x, s = M^2 + M Gamma tan(theta). For x in [0,1], theta covers about 318 periods of tan, so tan(theta) is Cauchy distributed and s follows
+  rho(s) = (1/pi) M Gamma / ((s - M^2)^2 + M^2 Gamma^2),
+and for y,
+  rho(y) = rho(s) ds/dy = (2y/pi) M Gamma / ((y^2 - M^2)^2 + M^2 Gamma^2).
+About 3% of x values give s < 0 (no real y); I dropped those, which is why rho(y) integrates to 0.968 instead of 1.
+
+Transformation 2: y = sqrt(M^2 + M Gamma tan(M Gamma x)), M = 100, Gamma = 10
+  M Gamma = 1000, so tan(M Gamma x) goes through 318.3 periods for x in [0,1]
+  s < 0 (no real y): 31671 = 0.0317 of all, expected atan(Gamma/M)/pi = 0.0317
+  outside [50,150]: 35889 = 0.0359 of all, expected 0.0359
+  chi^2 / ndof = 121.1 / 100
+
+The fraction outside the plot range matches the prediction. chi^2 is a little high, so I tried 5 other seeds and got 89 to 127, which is normal scatter. The peak is at y = M with a full width of about Gamma, and the tails are long.
+Plot: transform_breitwigner.png

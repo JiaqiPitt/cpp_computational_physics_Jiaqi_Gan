@@ -1,0 +1,19 @@
+Exercise 7.6 notes
+
+rho(cos theta) is the square of a combination of P1, P3, P5 and P7. It's already normalized: with the orthonormal Legendre functions the coefficients are 1/2, -sqrt(1/3), sqrt(1/12), -sqrt(1/3), and their squares add up to 1. The CDF is a degree-15 polynomial and hard to invert, so I used the rejection method: pick x uniform in [-1,1] and y uniform in [0, box], and keep x if y < rho(x).
+
+For the box height I scanned rho on [-1,1]. The maximum is at the ends, since every P_l(1) = 1:
+rho(1) = (sqrt(3/8) - sqrt(7/6) + sqrt(11/24) - sqrt(15/6))^2 = 1.882.
+I used 1.01 times that.
+
+To check the histogram I needed the exact integral of rho over each bin. My first try used SimpleIntegrator, but it evaluates points slightly past +-1 because of rounding, and GSL's Legendre function then stops the program with a domain error. I switched to an 8-point Gauss-Legendre rule. rho has degree 14, so 8 points (exact up to degree 15) give the exact answer, and the nodes are all inside the interval.
+
+Output (seed 12345, 100000 accepted events, 100 bins):
+integral of rho over [-1,1] = 1.0000000000
+max of rho = 1.882073 (at the ends: rho(1) = 1.882073), box height = 1.900894
+accepted 100000 of 380720 tries, efficiency 0.2627 (expected 1/(2*box) = 0.2630)
+chi^2 / ndof = 99.0 / 100
+
+The efficiency matches 1/(2*box), and chi^2/ndof is 0.99. The distribution is symmetric about cos theta = 0, because only odd P_l appear inside the square. It has two big peaks near +-0.28, two small ones near +-0.87, and a sharp rise in the last few hundredths before +-1. The end bins sit below the curve's maximum because each bin averages over that steep rise.
+
+Plot: angular_distribution.png
