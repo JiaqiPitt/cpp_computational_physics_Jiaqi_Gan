@@ -1,0 +1,24 @@
+Holy Dog Teacher and the Double Pendulum
+
+I started out wanting a double pendulum and nothing else, written with SoQt/Coin like the Chapter 10 examples. 
+The rods are aluminium and have mass, and each one ends in a bone biscuit that turns with its rod, so the biscuit's own moment of inertia also goes into the equations. 
+From the Lagrangian, the two equations of motion become a 2x2 linear system for the angular accelerations, which I solve at every RK4 step. 
+The time step is 1/1200 s, 20 steps per 1/60 s animation frame. Checks: with massless rods it matches the textbook formula to 1e-14, the energy (about 0.1 J) drifts by less than 1e-7 J in a minute, 
+and the small-oscillation periods (0.987 s and 0.417 s) agree with the normal modes from the eigenvalue problem.
+
+A pendulum on a white screen got boring fast, so I put it on a teacher's desk, and then the desk needed a teacher. I had an AI(ChatGPT Image 2.5 model) turn my dog BuBu into "dog Jesus" (halo, robe, open arms)
+and made him into a plywood cutout on a stick standing behind the desk. The outline comes from a mask of the photo, traced with marching squares and simplified to 174 points. The halo is a separate ring behind the head;
+I fitted a circle to it in the photo (radius 263.6 px, rms 2.3 px). There is a torsion spring at the bottom of the stick, so the cutout is an inverted pendulum with a spring: I phi'' = -k phi + M g h sin(phi). 
+I and M h come from the area moments of the outline polygon (Green's theorem) plus the ring and the stick, giving about 4.2 kg and I = 4.6 kg m^2, and k is set for a 1.6 s sway.
+
+Then came the extras: a Pitt plaque on the front of the desk (from the official brand files), an open book next to him, and a speech bubble drawn with QPainter on a card that always faces the camera. 
+He preaches "The Sermon on the Pendulum", ten lines shown one after another, each a Bible verse bent into physics: 
+"In the beginning was the Lagrangian", 
+"Let him who is without sin θ cast the first biscuit", 
+"I can walk on water. I cannot predict this pendulum", and finally "Peace be with you. Homework is due Friday."
+
+
+The hardest part was the lighting, not the physics. With SoShadowGroup, the floor in my first test renders came out black and the front panel of the desk disappeared, 
+because the textures were not loaded yet in the first frame. The dog looked much darker than the photo, so the print got a little emissive light. 
+His large outline polygon smeared the desk's shadow across his robe, so I had to change his shadow settings. The book grew grey stripes by shadowing itself; 
+setting it to "cast shadows only" did not help, and it needed no shadows at all. Every fix was small, but each one took a while to find.
