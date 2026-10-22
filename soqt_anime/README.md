@@ -2,6 +2,8 @@
 
 ![The dog jesus teacher and the double pendulum](images/demo.gif)
 
+*In the clip everything starts at rest. The lower biscuit is dragged up and let go, the teacher is tilted, and his speech bubble is clicked for the next line.*
+
 A small 3D scene made with SoQt/Coin for my Computational Physics class. A double-pendulum teaching model stands on a lectern, and the teacher, a plywood cutout of my dog dressed as Jesus, is mounted on a springy stick behind the desk and preaches *The Sermon on the Pendulum*, one speech bubble at a time. Both the pendulum and the teacher start at rest; they only move after you pull them with the mouse.
 
 ![Screenshot](images/screenshot.png)
