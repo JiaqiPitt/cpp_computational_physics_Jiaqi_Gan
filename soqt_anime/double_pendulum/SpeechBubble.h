@@ -25,17 +25,9 @@
 #include <algorithm>
 #include <vector>
 
-// A comic speech bubble.  Qt draws the bubble and its text (simple HTML, so
-// words can have their own colours) into an image whose outside is
-// transparent; the image is shown on a flat card that always turns to face
-// the viewer (SoVRMLBillboard).
 namespace bubble {
-
-// Bubble centred at the origin of the card, just big enough for its text but
-// at most maxWidth x maxHeight metres (the font shrinks only if the text does
-// not fit even then); its tail points at 'tip' (metres, relative to the
-// centre, in the plane of the card).
-inline SoSeparator* card(const QString& html, const QFont& font, float maxWidth, float maxHeight, const SbVec2f& tip) {
+inline SoSeparator* card(const QString& html, const QFont& font, float maxWidth, float maxHeight, const SbVec2f& tip,
+                         bool skipHint = false) {
     const float ppm = 2000.0f;   // pixels per metre on the image
     const float pad = 0.02f;     // room for the outline
 
@@ -53,7 +45,8 @@ inline SoSeparator* card(const QString& html, const QFont& font, float maxWidth,
         fitted.setPointSizeF(fitted.pointSizeF() * 0.95);
     }
     float width = std::clamp(float(doc.idealWidth() / ppm / 0.88), 0.45f, maxWidth);
-    float height = std::clamp(float(doc.size().height() / ppm / 0.80), 0.20f, maxHeight);
+    float hintStrip = skipHint ? 0.045f : 0.0f;   // room below the text for the "▶▶"
+    float height = std::clamp(float(doc.size().height() / ppm / 0.80), 0.20f, maxHeight) + hintStrip;
 
     float x0 = std::min(-width / 2, tip[0]) - pad, x1 = std::max(width / 2, tip[0]) + pad;
     float y0 = std::min(-height / 2, tip[1]) - pad, y1 = std::max(height / 2, tip[1]) + pad;
@@ -77,8 +70,18 @@ inline SoSeparator* card(const QString& html, const QFont& font, float maxWidth,
     painter.setBrush(QColor("#FFFDF6"));
     painter.drawPath(shape.united(tail).simplified());
 
+    if (skipHint) {
+        QFont arrows(font);
+        arrows.setPixelSize(int(0.034f * ppm));
+        painter.setFont(arrows);
+        painter.setPen(QColor("#8F887C"));
+        QPointF corner = px(width / 2 - 0.035f, -height / 2 + 0.010f);
+        painter.drawText(QRectF(corner.x() - 0.12 * ppm, corner.y() - 0.04 * ppm, 0.12 * ppm, 0.04 * ppm),
+                         Qt::AlignRight | Qt::AlignBottom, QString::fromUtf8("▶▶"));
+    }
+
     doc.setTextWidth(width * ppm * 0.92);
-    QPointF centreLeft = px(-width / 2 * 0.92f, 0.0f);
+    QPointF centreLeft = px(-width / 2 * 0.92f, hintStrip / 2);   // text centred above the hint strip
     painter.translate(centreLeft.x(), centreLeft.y() - doc.size().height() / 2);
     doc.drawContents(&painter);
     painter.end();
@@ -153,7 +156,7 @@ inline SoSeparator* sequence(const SbVec3f& offset, const SbVec2f& tipFromAnchor
     facing->addChild(pop);
     show = new SoSwitch;
     for (const QString& line : lines)
-        show->addChild(card(wrapCentred(line), font, maxWidth, maxHeight, tipFromAnchor - SbVec2f(offset[0], offset[1])));
+        show->addChild(card(wrapCentred(line), font, maxWidth, maxHeight, tipFromAnchor - SbVec2f(offset[0], offset[1]), true));
     show->whichChild = 0;
     facing->addChild(show);
     sep->addChild(facing);

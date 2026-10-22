@@ -64,6 +64,7 @@ public:
         camera->nearDistance = 0.1f;
         camera->farDistance = 60.0f;
         _root->addChild(camera);
+        _camera = camera;
 
         SoShadowGroup* shadows = new SoShadowGroup;
         shadows->quality = 1.0f;
@@ -105,6 +106,7 @@ public:
         if (teacher && teacher->valid()) {
             SoSeparator* dog = new SoSeparator;
             dog->setName("teacher");
+            _teacher = dog;
             // the dog casts a shadow but does not receive one: the only shadow
             // that could fall on it (from the desk) is on the part hidden
             // behind the desk, and its large outline faces would smear it
@@ -149,14 +151,38 @@ public:
     // bubble pops up from 70% of its size in about a tenth of a second
     void preach(double t) {
         if (!_sermonShow || _sermonSeconds.empty()) return;
-        double total = 0.0;
-        for (double s : _sermonSeconds) total += s;
-        double inCycle = std::fmod(t, total), start = 0.0;
-        int line = 0;
-        while (line + 1 < int(_sermonSeconds.size()) && inCycle >= start + _sermonSeconds[line]) start += _sermonSeconds[line++];
+        double start = 0.0, inCycle = 0.0;
+        int line = sermonLine(t, start, inCycle);
         if (_sermonShow->whichChild.getValue() != line) _sermonShow->whichChild = line;
         float size = float(1.0 - 0.3 * std::exp(-(inCycle - start) / 0.06));
         _sermonPop->scaleFactor.setValue(size, size, size);
+    }
+
+    // Skip to the start of the next line of the sermon (t = the current time)
+    void nextLine(double t) {
+        if (_sermonSeconds.empty()) return;
+        double start = 0.0, inCycle = 0.0;
+        int line = sermonLine(t, start, inCycle);
+        _sermonSkip += start + _sermonSeconds[line] - inCycle + 1e-6;
+        preach(t);
+    }
+
+    // For the mouse: the camera, the pivot of the pendulum in world
+    // coordinates, the plane (z = const) in which rod 2 swings, and the
+    // speech bubbles (to see whether a click hit them)
+    SoPerspectiveCamera* camera() const { return _camera; }
+    SbVec3f pivotWorld() const { return SbVec3f(MODEL_X, DESK_TOP + _pivotY, MODEL_Z); }
+    float swingPlaneZ() const { return MODEL_Z + _rod2Z; }
+    SoNode* speechBubbles() const { return _sermonShow; }
+    // the dog teacher, and the point it rocks about (top of its base) with z
+    // at the front face of the board
+    SoNode* teacherNode() const { return _teacher; }
+    SbVec3f teacherPivotWorld() const { return SbVec3f(TEACHER_X, DogBoard::BASE_HEIGHT, TEACHER_Z); }
+
+    // Start the trail again from the current position of the lower biscuit
+    void clearTrail(const DoublePendulum& p) {
+        _trail.assign(TRAIL_POINTS, SbVec3f(float(p.tipX()), float(p.tipY()), _rod2Z));
+        _head = 0;
     }
 
     // Store the current position of the lower biscuit (call after every step)
@@ -737,6 +763,20 @@ private:
     SoSwitch* _sermonShow = nullptr;   // which speech bubble is shown
     SoScale* _sermonPop = nullptr;     // size of the bubble, for the pop when it changes
     std::vector<double> _sermonSeconds;
+    double _sermonSkip = 0.0;          // seconds skipped ahead with the mouse or keyboard
+    SoPerspectiveCamera* _camera = nullptr;
+    SoSeparator* _teacher = nullptr;
+
+    // Line of the sermon at time t: its index, its start and the time within the cycle
+    int sermonLine(double t, double& start, double& inCycle) const {
+        double total = 0.0;
+        for (double s : _sermonSeconds) total += s;
+        inCycle = std::fmod(t + _sermonSkip, total);
+        start = 0.0;
+        int line = 0;
+        while (line + 1 < int(_sermonSeconds.size()) && inCycle >= start + _sermonSeconds[line]) start += _sermonSeconds[line++];
+        return line;
+    }
     int _head = 0;
     float _k = 0.3f, _pivotY = 0, _beamFront = 0, _rod1Z = 0, _rod2Z = 0;
 };

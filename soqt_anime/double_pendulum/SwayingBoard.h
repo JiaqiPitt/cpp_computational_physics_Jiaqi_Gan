@@ -31,6 +31,10 @@ public:
     }
 
     double angle() const { return _s[0]; }
+
+    // Put the board at a new tilt and rate (when it is moved by hand)
+    void setState(double angle, double rate) { _s = {angle, rate}; }
+
     double energy() const {
         return 0.5 * _p.inertia * _s[1] * _s[1] + 0.5 * _p.stiffness * _s[0] * _s[0]
              + _p.massHeight * _p.g * std::cos(_s[0]);

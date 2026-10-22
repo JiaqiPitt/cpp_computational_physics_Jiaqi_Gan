@@ -73,6 +73,9 @@ public:
     const Parameters& parameters() const { return _p; }
     double time() const { return _t; }
 
+    // Put the pendulum in a new state (when it is moved by hand)
+    void setState(const State& s) { _s = s; }
+
     // Elbow and tip positions relative to the pivot (x to the right, y up)
     double elbowX() const { return _p.l1 * std::sin(_s[0]); }
     double elbowY() const { return -_p.l1 * std::cos(_s[0]); }
