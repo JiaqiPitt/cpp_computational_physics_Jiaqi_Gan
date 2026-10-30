@@ -1,0 +1,47 @@
+Exercise 9.11 notes 
+
+Each photon gets a wavelength uniform in 400-700 nm, and n(lambda) comes from a cubic spline through Table 4.3 (my Exercise 4.7). The sun shines along -z. I picked the hit point uniform over the disk the drop shows to the sun (b = sqrt(u)), because sunlight lands evenly on that disk. Points uniform on the sphere itself would give too many grazing rays.
+
+The ray is traced in 3D with Snell's law and the reflection law in vector form: refract in, cross the drop, reflect, cross again, refract out. phi is the angle between the outgoing light and the reversed incident beam. For every photon I also computed phi = 4 theta_r - 2 theta_i from the 2D formula as a check.
+
+Output (250 million photons on 10 threads, the run the plots come from):
+250000000 photons on 10 threads in 3.60 s
+photons in the merged histograms: 250000000
+3d trace vs 4 theta_r - 2 theta_i: largest difference 2.9e-09 degrees
+
+band          peak of histogram   Descartes angle at the band edges
+400-450 nm     41.23 deg           41.21 -  41.50 deg
+450-500 nm     41.51 deg           41.50 -  41.79 deg
+500-550 nm     41.81 deg           41.79 -  42.08 deg
+550-600 nm     42.09 deg           42.08 -  42.22 deg
+600-650 nm     42.23 deg           42.22 -  42.37 deg
+650-700 nm     42.37 deg           42.37 -  42.37 deg
+
+
+a) phi runs from 0 up to about 42 deg and the light piles up at the top. That top is the Descartes angle, where dphi/db = 0, so a wide range of b comes out at almost the same phi. For one wavelength the peak and the cutoff are at the same angle. A 50 nm band spreads this out: the peak sits at the short-wavelength end of the band and the light stops at the long-wavelength end, as in the table. Red stops at 42.37 deg and violet at 41.21 deg, so the colours are spread over about 1.2 deg with red outside. The 650-700 nm band is a single spike because Table 4.3 has n = 1.331 at both 650 and 700 nm.
+Plots: rainbow_angle.png, rainbow_angle_zoom.png
+
+b) Each photon goes into the sky at angle phi from the antisolar point and azimuth psi around it, and each pixel adds up the red, green and blue cone responses from Exercise 4.8. I divided each cone curve by its average over 400-700 nm so white light stays white. rainbow_sky.png is the top half of the bow: red outside, then yellow and blue, a dim white glow inside, and nothing past 42.4 deg. rainbow_band.png is the colour across the bow with all azimuths added together, drawn the same way as my 4.9 band. There's no clear green stripe. The red and green cone curves overlap a lot, so 500-550 nm light comes out yellow-green, same as in 4.9.
+Plots: rainbow_sky.png, rainbow_band.png
+
+c) Every photon is independent, so I used the C++11 concurrency library (section 9.3.3). runParallel() splits the photons evenly and starts one std::async task per thread. Each task runs simulate() with its own seed (1000 + thread number) and fills its own Tally, so the threads only share the read-only tables and nothing needs a lock. At the end the main thread adds the tallies with +=. Two things had to be right for this: every thread has its own random engine, and n(lambda) and the cone curves are plain tables, because a Qat InterpolatingFunction updates its GSL cache whenever it is evaluated and can't be shared between threads. The merged histograms hold exactly 250000000 photons and the peaks are the same as in the one-thread run.
+
+d) My laptop is a MacBook Pro with an Apple M5: 10 cores, 4 performance and 6 efficiency, and hardware_concurrency() gives 10. I timed the same 25 million photons with 1 to 10 threads and with 20:
+
+threads   time (s)   speedup   efficiency
+    1       2.289      1.00       100%
+    2       1.185      1.93        97%
+    3       0.816      2.81        94%
+    4       0.618      3.71        93%
+    5       0.557      4.11        82%
+    6       0.546      4.19        70%
+    7       0.452      5.07        72%
+    8       0.416      5.50        69%
+    9       0.390      5.87        65%
+   10       0.363      6.31        63%
+   20       0.365      6.28        31%
+
+Up to 4 threads it stays close to the ideal line (3.71 at 4). Threads 5 to 10 end up on the efficiency cores, which add about half a performance core each, so all 10 give 6.3. 20 threads don't help because there are only 10 cores. Each point is a single run and moves by a few percent from run to run (6 threads came out a bit low this time). With all 10 cores the 250 million photons for the plots took 3.6 s; one thread would need about 23 s.
+Plot: speedup.png
+
+Jiaqi Gan, 2026-10-30
