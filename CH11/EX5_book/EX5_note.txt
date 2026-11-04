@@ -1,0 +1,27 @@
+Exercise 11.5 notes
+
+The equations of the spinning top, with u = cos theta:
+  du/dt   = sqrt(f(u)),   f(u) = (1 - u^2)(alpha - beta u) - (b - a u)^2
+  dphi/dt = (b - a u) / (1 - u^2)
+  dpsi/dt = I1 a / I3 - u (b - a u) / (1 - u^2)
+
+The catch is the square root. u swings between two roots of f and du/dt has to change sign at each of them, which sqrt can't do, so integrating it as written gets stuck at the first turning point. Differentiating (du/dt)^2 = f(u) gives d^2u/dt^2 = f'(u)/2, which has no sign problem. I integrated u, du/dt, phi and psi with RKIntegrator and an AdaptiveRKStepper (tolerance 1e-10), and got f'(u) from f.partial(U).
+
+Toy top: M = 0.1 kg, l = 4 cm, I1 = 1.6e-4 kg m^2, I3 = 6e-5 kg m^2, spin 150 rad/s. Every run starts with theta' = 0, so u starts at a turning point:
+  cusps: let go at rest at theta = 30 deg
+  waves: phi' = +2 rad/s at theta = 50 deg
+  loops: phi' = -2 rad/s at theta = 70 deg
+
+Results over the first second:
+          theta range (deg)   nutation period (s)   mean precession (rad/s)
+  cusps   30.00 - 35.55       0.129529              4.67674
+  waves   50.00 - 54.37       0.122413              4.53939
+  loops   70.00 - 82.85       0.115428              4.40665
+
+Checks: u stays between the two roots of f to 6 digits, (du/dt)^2 - f(u) is never more than 6e-8 /s^2, and the period and precession rate agree with 2 int du/sqrt(f) to every digit printed. For that integral I put u = u1 + (u2 - u1) sin^2 s, so there's no singularity at the ends.
+
+top_u.png is the nutation. In top_phi.png the cusp run goes up in steps, with phi' = 0 at every cusp, the wave run always goes up, and the loop run goes backwards for a moment every period. top_psi.png is three almost straight lines at about 150 rad/s; the nutation only changes the slope a little. top_axis.png shows where the axis points (phi against 90 - theta) and has the three shapes from Goldstein.
+
+Animation (animation/, SoQt): same equations, but with my own RK4, because RKIntegrator keeps every step it takes and the memory would keep growing in a long animation. At t = 1 s it gives phi = 4.763, 4.497, 4.504 rad, the same as the RKIntegrator runs. The top sits on a post because in the loop run it gets down to 83 deg. Three SoRotation nodes do phi, theta and psi in Goldstein's z-x-z order with y up. It runs 20 times slower than real time, and the blue trail of the knob draws the same cusps, waves and loops.
+
+Jiaqi Gan, 2026-11-04

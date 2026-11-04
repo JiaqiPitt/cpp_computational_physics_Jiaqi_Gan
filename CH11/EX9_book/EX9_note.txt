@@ -1,0 +1,35 @@
+Exercise 11.9 notes
+
+SymplecticIntegrator.h takes a separable Hamiltonian H = T(p) + V(q), written with the PhaseSpace variables as in Section 11.5.2, and gets dH/dq and dH/dp from .partial(). Since H is separable, q can be moved with p held fixed (a drift) and p with q held fixed (a kick). Each of these is an exact flow, so any sequence of them is symplectic. Three methods:
+  EULER     drift h, kick h (the book's SYMPLECTIC example)                      order 1
+  LEAPFROG  kick h/2, drift h, kick h/2                                          order 2
+  YOSHIDA   leapfrog steps of w1 h, w0 h, w1 h, w1 = 1/(2 - 2^(1/3)), w0 = 1 - 2 w1   order 4
+The constructor also checks that d2H/dq dp is zero, using .partial() again, and refuses H otherwise. H = p^2 (1 + q^2) / 2 gets refused.
+
+1. Harmonic oscillator, q(0) = 0, p(0) = 1, error in (q, p) at t = 10 against sin t, cos t:
+       h      symplectic Euler   leapfrog    Yoshida
+   0.20000    6.743e-02          1.915e-02   1.094e-03
+   0.10000    2.998e-02          4.761e-03   6.801e-05
+   0.05000    1.423e-02          1.188e-03   4.245e-06
+   0.02500    6.950e-03          2.970e-04   2.652e-07
+   0.01250    3.437e-03          7.425e-05   1.657e-08
+   0.00625    1.709e-03          1.856e-05   1.036e-09
+   order      1.01               2.00        4.00
+Halving h divides the error by 2, 4 and 16, as it should.
+Plot: sep_order.png
+
+2. Pendulum, H = p^2/2 - cos q, let go from q = 2 rad with h = 0.1. Largest |E - E0| / |E0| up to t = 10^4:
+   symplectic Euler   1.45e-01
+   leapfrog           6.50e-03
+   Yoshida            2.75e-05
+   Runge-Kutta 4      2.46e-03   (Qat's RungeKuttaSolver with a SimpleRKStepper, same h)
+For the three symplectic methods the error stops growing during the first swing. Runge-Kutta starts below all of them, but its error grows the whole time. It passes Yoshida at about t = 100 and by t = 10^4 is almost as big as leapfrog's.
+Plot: sep_energy.png
+
+3. Kepler orbit, H = (px^2 + py^2)/2 - 1/r, from (1, 0) with p = (0, 1.2), so e = 0.44. I used a big step on purpose, h = 0.4 (37 steps a turn), and ran 100 turns:
+   leapfrog        E - E0 = +1.3e-02   L - L0 = -1.0e-14
+   Runge-Kutta 4   E - E0 = -4.4e-02   L - L0 = -3.7e-02
+Leapfrog keeps the angular momentum to rounding error, because every kick is along r and every drift is along p. Its energy error stays bounded, so the 100th turn is still the right size, but the ellipse has turned around a long way. Runge-Kutta keeps the direction better but loses energy and angular momentum, so its orbit shrinks.
+Plot: sep_kepler.png (the exact ellipse and the 100th turn of each method)
+
+Jiaqi Gan, 2026-11-04

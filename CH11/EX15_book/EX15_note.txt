@@ -1,0 +1,38 @@
+Exercise 11.15 notes
+
+a) From Fig. 11.12, leaving out the dashed line, so lambda is just a rate:
+  dS/dt = b N - lambda S - d S + nu R
+  dE/dt = lambda S - (alpha + d) E
+  dI/dt = alpha E - (gamma + d) I
+  dR/dt = gamma I - (nu + d) R
+nu is the arrow from R back to S, immunity wearing off. With lambda fixed this is a linear system. The dashed line is what makes lambda = beta I / N, and then the S and E equations have beta S I / N in them, which is no longer linear.
+
+b) Adding the four equations, every arrow between two groups cancels and dN/dt = (b - d) N. So with b = d the total population stays the same, but S, E, I and R keep changing. I took the births as b N. If they were a flat b people a day instead, N would settle at b/d, which is 1 here, so it is static either way.
+
+c) Every group dies at the same rate d, so the model assumes the disease kills nobody. Being exposed or infectious doesn't shorten anyone's life, and there is no extra death term for I.
+
+d) RKIntegrator with an AdaptiveRKStepper (tolerance 1e-10), N = 1, rates per day, out to 10000 days. Tolerances from 1e-8 to 1e-12 give the same answers to 4 digits, and N stays 1 to 1e-15.
+
+  basic reproduction number R_0 = beta alpha / ((alpha + d)(gamma + d)) = 2.00
+  early growth: 0.04130 /day from the run, 0.04132 /day from (k + alpha + d)(k + gamma + d) = alpha beta,
+                so I doubles every 16.8 days
+
+  highs and lows of I:
+       day       I/N        S
+         6    7.58e-07   1.000   low
+       326    7.73e-02   0.468   high
+       820    4.86e-05   0.504   low
+      1443    2.06e-02   0.493   high
+      1864    1.35e-03   0.503   low
+      2338    1.04e-02   0.498   high
+  later highs come every 856 days
+
+  day 10000:    S = 0.50101   E = 5.379e-03   I = 5.373e-03   R = 0.48824
+  equilibrium:  S = 0.50100   E = 5.376e-03   I = 5.371e-03   R = 0.48825
+The equilibrium is S = N/R_0, alpha E = (gamma + d) I, (nu + d) R = gamma I, with S + E + I + R = N fixing I.
+
+I dips for the first few days, because all the first cases are already infectious and nobody is exposed yet. Then it grows exponentially, and the first wave peaks on day 326 with 7.7% of people infectious. By then S is falling far below 1/R_0 = 0.5, so I drops by more than a factor of 1000. Immunity wears off at nu = 1e-3 per day (about 3 years) and births add a little, so S climbs back past 0.5 and another wave starts. Each wave is smaller than the one before, and it settles to the endemic equilibrium. That is why the plot has to be on a log scale: I goes from 1e-6 up to 0.08, down to 5e-5, up to 0.02, and so on.
+
+Plots: seir_infected.png (I/N on a log scale, with the equilibrium as a dashed line), seir_groups.png (all four groups; E is dashed because with alpha = gamma it lies almost on top of I)
+
+Jiaqi Gan, 2026-11-04
